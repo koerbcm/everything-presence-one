@@ -22,7 +22,8 @@ update:
     disabled_by_default: true
 
 dashboard_import:
-  package_import_url: github://everythingsmarthome/everything-presence-one/everything-presence-one.yaml@main
+  # package_import_url: github://everythingsmarthome/everything-presence-one/everything-presence-one.yaml@main
+  package_import_url: github://koerbcm/everything-presence-one/everything-presence-one.yaml@main
   import_full_config: false
 
 packages:

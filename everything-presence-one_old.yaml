@@ -24,7 +24,8 @@ packages:
   sen0395_base: !include common/sen0395-common.yaml
 light:
   - platform: status_led
-    name: ESP32 status LED
+    name: "${friendly_name}: Status LED"
+    id: "${id_prefix}_status_led"
     pin: GPIO32
     entity_category: config
     disabled_by_default: True
