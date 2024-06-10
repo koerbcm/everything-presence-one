@@ -1,10 +1,11 @@
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
+  id_prefix: ${id_prefix}
   name_add_mac_suffix: true
   project:
     name: ${project_name}
-    version: ${project_version} 
+    version: ${project_version}
   on_boot:
     priority: -100
     then:
@@ -35,31 +36,38 @@ i2c:
 
 light:
   - platform: status_led
-    name: ESP32 status LED
+    name: "${friendly_name}: Status LED"
+    id: "${id_prefix}_status_led"
     pin: GPIO32
     entity_category: config
-    disabled_by_default: False
+    disabled_by_default: True
 
 sensor:
   - platform: shtcx
     id: "shtc3_sensor"
     temperature:
-      name: Temperature
-      id: temperature_sensor
+      name: "${friendly_name}: Temperature"
+      id: "${id_prefix}_temperature"
+      icon: mdi:thermometer
+      device_class: "temperature"
       filters:
         - offset: ${temperature_offset}
-        - lambda: "return x + id(temperature_offset_ui).state;"
+        - lambda: "return x + id(${id_prefix}_temperature_offset_ui).state;"
     humidity:
-      name: Humidity
-      id: humidity_sensor
+      name: "${friendly_name}: Humidity"
+      id: "${id_prefix}_humidity"
+      icon: mdi:water-percent
+      device_class: "humidity"
       filters:
         - offset: ${humidity_offset}
-        - lambda: "return x + id(humidity_offset_ui).state;"
+        - lambda: "return x + id(${id_prefix}_humidity_offset_ui).state;"
     address: 0x70
     update_interval: ${temperature_update_interval}
   - platform: bh1750
-    name: Illuminance
-    id: illuminance_sensor
+    name: "${friendly_name}: Illuminance"
+    id: "${id_prefix}_illuminance"
+    icon: mdi:brightness-5
+    device_class: "illuminance"
     address: 0x23
     update_interval: ${illuminance_update_interval}
     filters:
@@ -99,8 +107,8 @@ sensor:
             - 63.8 -> 157.6
             - 71.5 -> 176.9
             - 79.8 -> 197.1
-            - 84.3 -> 205.7 
-      - lambda: "return x + id(illuminance_offset_ui).state;"
+            - 84.3 -> 205.7
+      - lambda: "return x + id(${id_prefix}_illuminance_offset_ui).state;"
       - clamp:
           min_value: 0
 
@@ -109,36 +117,38 @@ binary_sensor:
     pin:
       number: 33
       mode: INPUT_PULLDOWN
-    name: PIR
-    id: pir_motion_sensor
+    name: "${friendly_name}: PIR"
+    id: "${id_prefix}_motion"
+    icon: mdi:motion-sensor
     device_class: motion
     filters:
-      - delayed_off:  !lambda 'return id(pir_off_latency).state * 1000.0;'
+      - delayed_off:  !lambda 'return id(${id_prefix}_pir_off_latency).state * 1000.0;'
   - platform: template
-    name: Occupancy
-    id: occupancy
+    name: "${friendly_name}: Occupancy"
+    id: "${id_prefix}_occupancy"
+    icon: mdi:home-outline
     device_class: occupancy
     filters:
-      - delayed_off: !lambda 'return id(occupancy_off_latency).state * 1000.0;'
+      - delayed_off: !lambda 'return id(${id_prefix}_occupancy_off_latency).state * 1000.0;'
     on_state:
-      - lambda: 'id(illuminance_sensor).update();'
+      - lambda: 'id(${id_prefix}_illuminance).update();'
     lambda: |-
-      if ( id(mmwave).state or id(pir_motion_sensor).state) {
+      if ( id(${id_prefix}_mmwave).state or id(${id_prefix}_motion).state) {
         return true;
-      } 
-      else if (id(mmwave).state == 0 and id(pir_motion_sensor).state == 0) {
+      }
+      else if (id(${id_prefix}_mmwave).state == 0 and id(${id_prefix}_motion).state == 0) {
         return false;
-      } 
+      }
       else {
-        return id(occupancy).state;
+        return id(${id_prefix}_occupancy).state;
       }
 
 number:
   - platform: template
-    name: Occupancy off latency
+    name: "${friendly_name}: Occupancy off latency"
     icon: mdi:clock-end
     entity_category: config
-    id: occupancy_off_latency
+    id: "${id_prefix}_occupancy_off_latency"
     min_value: 1
     max_value: 600
     initial_value: 15
@@ -149,10 +159,10 @@ number:
     mode: slider
 
   - platform: template
-    name: PIR off latency
+    name: "${friendly_name}: PIR off latency"
     icon: mdi:clock-end
     entity_category: config
-    id: pir_off_latency
+    id: "${id_prefix}_pir_off_latency"
     min_value: 1
     max_value: 120
     initial_value: 10
@@ -163,8 +173,8 @@ number:
     mode: slider
 
   - platform: template
-    name: "Temperature Offset"
-    id: temperature_offset_ui
+    name: "${friendly_name}: Temperature Offset"
+    id: "${id_prefix}_temperature_offset_ui"
     unit_of_measurement: "°C"
     min_value: -20
     max_value: 20
@@ -179,8 +189,8 @@ number:
     on_value:
       - lambda: 'id(shtc3_sensor).update();'
   - platform: template
-    name: "Humidity Offset"
-    id: humidity_offset_ui
+    name: "${friendly_name}: Humidity Offset"
+    id: "${id_prefix}_humidity_offset_ui"
     unit_of_measurement: "%"
     min_value: -50
     max_value: 50
@@ -195,8 +205,8 @@ number:
     on_value:
       - lambda: 'id(shtc3_sensor).update();'
   - platform: template
-    name: "Illuminance Offset"
-    id: illuminance_offset_ui
+    name: "${friendly_name}: Illuminance Offset"
+    id: "${id_prefix}_illuminance_offset_ui"
     unit_of_measurement: "lx"
     min_value: -50
     max_value: 50
@@ -209,15 +219,15 @@ number:
     icon: "mdi:brightness-5"
     entity_category: config
     on_value:
-      - lambda: 'id(illuminance_sensor).update();'
+      - lambda: 'id(${id_prefix}_illuminance).update();'
 
 button:
   - platform: restart
-    id: restart_internal
+    id: "${id_prefix}_restart_internal"
     entity_category: config
     internal: true
   - platform: safe_mode
     internal: false
-    name: Safe mode
+    name: "${friendly_name}: Safe mode"
     entity_category: config
     disabled_by_default: True
