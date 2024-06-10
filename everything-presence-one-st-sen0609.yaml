@@ -45,7 +45,10 @@ wifi:
 captive_portal:
 
 improv_serial:
-  
+
+esp32_improv:
+  authorizer: none
+
 light:
   - platform: status_led
     name: "ESP32 Status LED"
@@ -176,10 +179,10 @@ binary_sensor:
     lambda: |-
       if ( id(mmwave).state or id(pir_motion_sensor).state) {
         return true;
-      } 
+      }
       else if (id(mmwave).state == 0 and id(pir_motion_sensor).state == 0) {
         return false;
-      } 
+      }
       else {
         return id(occupancy).state;
       }
@@ -717,11 +720,11 @@ button:
   - platform: restart
     name: Restart_internal
     id: restart_internal
-    entity_category: config 
+    entity_category: config
     internal: true
   - platform: template
     name: "Restart mmWave Sensor"
-    id: "restart_mmwave"
+    id: "${id_prefix}_restart_mmwave"
     entity_category: config
     internal: true
     on_press:
@@ -730,8 +733,8 @@ button:
     name: Restart $name
     entity_category: config
     on_press:
-      - button.press: restart_mmwave
-      - button.press: restart_internal
+      - button.press: "${id_prefix}_restart_mmwave"
+      - button.press: "${id_prefix}_restart_internal"
   - platform: safe_mode
     internal: false
     name: $name Safe Mode
