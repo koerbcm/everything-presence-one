@@ -22,6 +22,13 @@ logger:
 api:
 
 ota:
+  - platform: esphome
+    id: ota_esphome
+  - platform: http_request
+    id: ota_http_request
+
+http_request:
+  timeout: 4s
 
 wifi:
   fast_connect: ${hidden_ssid}

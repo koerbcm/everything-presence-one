@@ -3,7 +3,7 @@ substitutions:
   room: ""
   friendly_name: "Everything Presence One ST"
   project_name: "Everything Smart Technology.Everything Presence One"
-  project_version: "1.2.3s"
+  project_version: "1.2.5s"
   temperature_offset: "-3"
   humidity_offset: "5"
   temperature_update_interval: "60s"
@@ -32,6 +32,7 @@ esp32:
 logger:
 
 ota:
+  - platform: esphome
 
 web_server:
 
@@ -42,9 +43,6 @@ wifi:
 captive_portal:
 
 improv_serial:
-
-esp32_improv:
-  authorizer: none
 
 light:
   - platform: status_led
