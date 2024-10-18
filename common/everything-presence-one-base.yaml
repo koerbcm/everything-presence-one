@@ -1,6 +1,7 @@
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
+  id_prefix: ${id_prefix}
   name_add_mac_suffix: true
   project:
     name: ${project_name}
@@ -8,7 +9,7 @@ esphome:
   on_boot:
     priority: -100
     then:
-      - switch.turn_on: mmwave_sensor
+      - switch.turn_on: "${id_prefix}_mmwave_sensor"
 
 esp32:
   board: esp32dev
@@ -33,7 +34,7 @@ http_request:
 wifi:
   fast_connect: ${hidden_ssid}
   on_connect:
-    - switch.turn_on: mmwave_sensor
+    - switch.turn_on: "${id_prefix}_mmwave_sensor"
 
 improv_serial:
 
